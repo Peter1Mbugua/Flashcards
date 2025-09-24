@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard Organizer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gray: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: var(--dark);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      padding: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-container {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .form-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    input {
+      flex: 1;
+      padding: 15px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background-color: white;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    button {
+      padding: 15px 25px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-back {
+      background: linear-gradient(135deg, var(--secondary), #7c3aed);
+      color: white;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+
+    .btn-back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .folders-container, .flashcards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .folder {
+      background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-radius: 16px;
+      padding: 25px 20px;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .folder::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--accent);
+    }
+
+    .folder:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .folder i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .folder-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .folder-count {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .flashcard {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .flashcard:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+
+    .flashcard.flipped .flashcard-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-front, .flashcard-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .flashcard-front {
+      color: var(--dark);
+      z-index: 2;
+    }
+
+    .flashcard-back {
+      color: var(--primary-dark);
+      font-style: italic;
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-image {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      object-fit: contain;
+    }
+
+    .flashcard-text {
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .flashcard-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+
+    .flashcard:hover .flashcard-actions {
+      opacity: 1;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: var(--gray);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .action-btn.edit:hover {
+      background: var(--warning);
+      color: white;
+    }
+
+    .action-btn.delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .action-btn.enlarge:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: var(--primary);
+      opacity: 0.7;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 15px 50px 15px 20px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--gray);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 1001;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .notification.success {
+      background: var(--success);
+    }
+
+    .notification.error {
+      background: var(--danger);
+    }
+
+    .image-upload {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .image-upload-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .image-upload-group label {
+      flex: 1;
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .image-upload-group label:hover {
+      background: #e2e8f0;
+    }
+
+    .image-preview {
+      max-width: 100px;
+      max-height: 100px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+      .folders-container, .flashcards-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .form-group {
+        flex-direction: column;
+      }
+    }
+
+    /* Enlarged Flashcard Modal Styles */
+    .enlarged-modal-content {
+      max-width: 800px;
+      width: 90%;
+      position: relative;
+    }
+
+    .enlarged-flashcard-container {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      perspective: 1500px;
+      margin-bottom: 20px;
+    }
+
+    .enlarged-flashcard {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .enlarged-flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .enlarged-flashcard-front, .enlarged-flashcard-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      background: white;
+      overflow: auto;
+    }
+
+    .enlarged-flashcard-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    }
+
+    .enlarged-flashcard-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      object-fit: contain;
+      box-shadow: var(--shadow);
+    }
+
+    .enlarged-flashcard-text {
+      font-size: 1.8rem;
+      line-height: 1.6;
+      text-align: center;
+      color: var(--dark);
+    }
+
+    .enlarged-flashcard-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .nav-btn:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .flashcard-counter {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .flip-hint {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 id="page-title"><i class="fas fa-book-open"></i> Flashcard Organizer</h1>
+    <p class="subtitle">Create, organize, and study your flashcards efficiently</p>
+  </div>
+
+  <div class="container">
+    <!-- Dynamic Content -->
+    <div id="content"></div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Edit Item</h3>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="edit-input" placeholder="Enter new value">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enlarged Flashcard Modal -->
+  <div id="enlarged-modal" class="modal">
+    <div class="enlarged-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="enlarged-modal-title">Flashcard Preview</h3>
+        <button class="close-modal" onclick="closeEnlargedModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="enlarged-flashcard-container">
+          <div id="enlarged-flashcard" class="enlarged-flashcard">
+            <div class="enlarged-flashcard-front">
+              <!-- Front content will be inserted here -->
+            </div>
+            <div class="enlarged-flashcard-back">
+              <!-- Back content will be inserted here -->
+            </div>
+            <div class="flip-hint">Click to flip card</div>
+          </div>
+        </div>
+        <div class="enlarged-flashcard-navigation">
+          <button id="prev-btn" class="nav-btn" onclick="navigateFlashcard(-1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="flashcard-counter">
+            <span id="current-card">1</span> / <span id="total-cards">1</span>
+          </div>
+          <button id="next-btn" class="nav-btn" onclick="navigateFlashcard(1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div id="notification" class="notification"></div>
+
+  <script>
+    // Initialize data from localStorage or empty object
+    let data = {};
+    let currentSubject = null;
+    let currentTopic = null;
+    let editType = null;
+    let editIndex = null;
+    let currentCardIndex = 0;
+
+    // Load data from localStorage when page loads
+    function loadData() {
+      const savedData = localStorage.getItem("flashcardData");
+      if (savedData) {
+        try {
+          data = JSON.parse(savedData);
+        } catch (e) {
+          console.error("Error parsing saved data:", e);
+          data = {};
+        }
+      }
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      try {
+        localStorage.setItem("flashcardData", JSON.stringify(data));
+      } catch (e) {
+        console.error("Error saving data:", e);
+        showNotification("Error saving data. Your flashcards may not be saved.", "error");
+      }
+    }
+
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    function showSubjects() {
+      currentSubject = null;
+      currentTopic = null;
+      document.getElementById("page-title").innerHTML = '<i class="fas fa-book-open"></i> FLASHCARD ORGANIZER';
+      const content = document.getElementById("content");
+      
+      const stats = {
+        subjects: Object.keys(data).length,
+        topics: Object.values(data).reduce((sum, subject) => sum + Object.keys(subject).length, 0),
+        flashcards: Object.values(data).reduce((sum, subject) => 
+          sum + Object.values(subject).reduce((topicSum, topic) => topicSum + topic.length, 0), 0)
+      };
+      
+      content.innerHTML = `
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="stat-value">${stats.subjects}</div>
+            <div class="stat-label">Subjects</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.topics}</div>
+            <div class="stat-label">Topics</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.flashcards}</div>
+            <div class="stat-label">Flashcards</div>
+          </div>
+        </div>
+        
+        <div class="form-container">
+          <div class="form-group">
+            <input type="text" id="new-subject" placeholder="Enter new subject">
+            <button class="btn-primary" onclick="addSubject()">
+              <i class="fas fa-plus"></i> Add Subject
+            </button>
+          </div>
+        </div>
+        
+        <div class="folders-container" id="folders-container">
+          ${Object.keys(data).length === 0 ? 
+            `<div class="empty-state">
+              <i class="fas fa-book"></i>
+              <p>No subjects yet. Add your first subject to get started!</p>
+            </div>` : ''}
+        </div>
+      `;
+      
+      const foldersContainer = document.getElementById("folders-container");
+      for (let subject in data) {
+        const topicCount = Object.keys(data[subject]).length;
+        const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => sum + topic.length, 0);
+        
+        const div = document.createElement("div");
+        div.className = "folder";
+        div.innerHTML = `
+          <i class="fas fa-book"></i>
+          <div class="folder-title">${subject}</div>
+          <div class="folder-count">${topicCount} topics, ${flashcardCount} cards</div>
+          <div class="flashcard-actions">
+            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('subject', '${subject}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" onclick="event.stopPropagation(); deleteSubject('${subject}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `;
+        div.onclick = () => showTopics(subject);
+        foldersContainer.appendChild(div);
+      }
+    }
+
+    function addSubject() {
+      const subject = document.getElementById("new-subject").value.trim();
+      if (subject) {
+        if (!data[subject]) {
+          data[subject] = {};
+          saveData();
+          showSubjects();
+          showNotification(`Subject "${subject}" added successfully!`);
+        } else {
+          showNotification(`Subject "${subject}" already exists!`, 'error');
+        }
+      } else {
+        showNotification("Please enter a subject name!", 'error');
+      }
+    }
+
+    function deleteSubject(subject) {
+      if (confirm(`Are you sure you want to delete the subject "${subject}" and all its topics and flashcards?`)) {
+        delete data[subject];
+        saveData();
+        showSubjects();
+        showNotification(`Subject "${subject}" deleted successfully!`);
+      }
+    }
+
+    function showTopics(subject) {
+      currentSubject = subject;
+      currentTopic = null;
+      document.getElementById("page-title").innerHTML = `<i class="fas fa-folder-open"></i> ${subject} Topics`;
+      const content = document.getElementById("content");
+      
+      const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => sum + topic.length, 0);
+      
+      content.innerHTML = `
+        <button class="btn-back" onclick="showSubjects()">
+          <i class="fas fa-arrow-left"></i> Back to Subjects
+        </button>
+        
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="stat-value">${Object.keys(data[subject]).length}</div>
+            <div class="stat-label">Topics</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${flashcardCount}</div>
+            <div class="stat-label">Flashcards</div>
+          </div>
+        </div>
+        
+        <div class="form-container">
+          <div class="form-group">
+            <input type="text" id="new-topic" placeholder="Enter new topic">
+            <button class="btn-primary" onclick="addTopic()">
+              <i class="fas fa-plus"></i> Add Topic
+            </button>
+          </div>
+        </div>
+        
+        <div class="folders-container" id="folders-container">
+          ${Object.keys(data[subject]).length === 0 ? 
+            `<div class="empty-state">
+              <i class="fas fa-folder-open"></i>
+              <p>No topics yet. Add your first topic to get started!</p>
+            </div>` : ''}
+        </div>
+      `;
+      
+      const foldersContainer = document.getElementById("folders-container");
+      for (let topic in data[subject]) {
+        const flashcardCount = data[subject][topic].length;
+        
+        const div = document.createElement("div");
+        div.className = "folder";
+        div.innerHTML = `
+          <i class="fas fa-folder"></i>
+          <div class="folder-title">${topic}</div>
+          <div class="folder-count">${flashcardCount} flashcards</div>
+          <div class="flashcard-actions">
+            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('topic', '${topic}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" onclick="event.stopPropagation(); deleteTopic('${topic}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `;
+        div.onclick = () => showFlashcards(topic);
+        foldersContainer.appendChild(div);
+      }
+    }
+
+    function addTopic() {
+      const topic = document.getElementById("new-topic").value.trim();
+      if (topic) {
+        if (!data[currentSubject][topic]) {
+          data[currentSubject][topic] = [];
+          saveData();
+          showTopics(currentSubject);
+          showNotification(`Topic "${topic}" added successfully!`);
+        } else {
+          showNotification(`Topic "${topic}" already exists!`, 'error');
+        }
+      } else {
+        showNotification("Please enter a topic name!", 'error');
+      }
+    }
+
+    function deleteTopic(topic) {
+      if (confirm(`Are you sure you want to delete the topic "${topic}" and all its flashcards?`)) {
+        delete data[currentSubject][topic];
+        saveData();
+        showTopics(currentSubject);
+        showNotification(`Topic "${topic}" deleted successfully!`);
+      }
+    }
+
+    function showFlashcards(topic) {
+      currentTopic = topic;
+      document.getElementById("page-title").innerHTML = `<i class="fas fa-sticky-note"></i> ${topic} Flashcards`;
+      const content = document.getElementById("content");
+      
+      content.innerHTML = `
+        <button class="btn-back" onclick="showTopics('${currentSubject}')">
+          <i class="fas fa-arrow-left"></i> Back to Topics
+        </button>
+        
+        <div class="search-container">
+          <input type="text" class="search-input" id="search-flashcards" placeholder="Search flashcards..." onkeyup="filterFlashcards()">
+          <i class="fas fa-search search-icon"></i>
+        </div>
+        
+        <div class="form-container">
+          <div class="form-group">
+            <input type="text" id="question" placeholder="Enter question">
+            <input type="text" id="answer" placeholder="Enter answer">
+          </div>
+          
+          <div class="image-upload">
+            <div class="image-upload-group">
+              <label for="question-image">
+                <i class="fas fa-image"></i> Question Image
+              </label>
+              <input type="file" id="question-image" accept="image/*" style="display: none;" onchange="previewImage(this, 'question-preview')">
+              <img id="question-preview" class="image-preview" style="display: none;">
+            </div>
+            
+            <div class="image-upload-group">
+              <label for="answer-image">
+                <i class="fas fa-image"></i> Answer Image
+              </label>
+              <input type="file" id="answer-image" accept="image/*" style="display: none;" onchange="previewImage(this, 'answer-preview')">
+              <img id="answer-preview" class="image-preview" style="display: none;">
+            </div>
+          </div>
+          
+          <button class="btn-primary" onclick="addFlashcard()">
+            <i class="fas fa-plus"></i> Add Flashcard
+          </button>
+        </div>
+        
+        <div class="flashcards-container" id="flashcards-container">
+          ${data[currentSubject][currentTopic].length === 0 ? 
+            `<div class="empty-state">
+              <i class="fas fa-sticky-note"></i>
+              <p>No flashcards yet. Add your first flashcard to get started!</p>
+            </div>` : ''}
+        </div>
+      `;
+      
+      renderFlashcards();
+    }
+
+    function previewImage(input, previewId) {
+      const preview = document.getElementById(previewId);
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    function addFlashcard() {
+      const question = document.getElementById("question").value.trim();
+      const answer = document.getElementById("answer").value.trim();
+      const questionImagePreview = document.getElementById("question-preview");
+      const answerImagePreview = document.getElementById("answer-preview");
+      
+      const questionImage = questionImagePreview.style.display !== 'none' ? questionImagePreview.src : "";
+      const answerImage = answerImagePreview.style.display !== 'none' ? answerImagePreview.src : "";
+      
+      if (question || answer || questionImage || answerImage) {
+        const flashcard = {
+          question: question || "",
+          answer: answer || "",
+          questionImage: questionImage,
+          answerImage: answerImage
+        };
+        
+        data[currentSubject][currentTopic].push(flashcard);
+        saveData();
+        renderFlashcards();
+        
+        // Reset form
+        document.getElementById("question").value = "";
+        document.getElementById("answer").value = "";
+        questionImagePreview.style.display = "none";
+        answerImagePreview.style.display = "none";
+        document.getElementById("question-image").value = "";
+        document.getElementById("answer-image").value = "";
+        questionImagePreview.src = "";
+        answerImagePreview.src = "";
+        
+        showNotification("Flashcard added successfully!");
+      } else {
+        showNotification("Please enter a question, answer, or add an image!", 'error');
+      }
+    }
+
+    function renderFlashcards() {
+      const container = document.getElementById("flashcards-container");
+      container.innerHTML = "";
+      
+      if (data[currentSubject][currentTopic].length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-sticky-note"></i>
+            <p>No flashcards yet. Add your first flashcard to get started!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      data[currentSubject][currentTopic].forEach((card, i) => {
+        const div = document.createElement("div");
+        div.className = "flashcard";
+        div.dataset.index = i;
+        
+        let frontContent = "";
+        let backContent = "";
+        
+        // Front side (question)
+        if (card.questionImage) {
+          frontContent += `<img src="${card.questionImage}" class="flashcard-image">`;
+        }
+        if (card.question) {
+          frontContent += `<p class="flashcard-text">${card.question}</p>`;
+        }
+        
+        // Back side (answer)
+        if (card.answerImage) {
+          backContent += `<img src="${card.answerImage}" class="flashcard-image">`;
+        }
+        if (card.answer) {
+          backContent += `<p class="flashcard-text">${card.answer}</p>`;
+        }
+        
+        div.innerHTML = `
+          <div class="flashcard-actions">
+            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('flashcard', ${i})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" onclick="event.stopPropagation(); deleteFlashcard(${i})">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button class="action-btn enlarge" onclick="event.stopPropagation(); openEnlargedModal(${i})">
+              <i class="fas fa-expand"></i>
+            </button>
+          </div>
+          <div class="flashcard-inner">
+            <div class="flashcard-front">
+              ${frontContent}
+            </div>
+            <div class="flashcard-back">
+              ${backContent}
+            </div>
+          </div>
+        `;
+        
+        div.onclick = function(e) {
+          if (e.target.closest('.action-btn')) return;
+          this.classList.toggle('flipped');
+        };
+        
+        container.appendChild(div);
+      });
+    }
+
+    function filterFlashcards() {
+      const searchTerm = document.getElementById('search-flashcards').value.toLowerCase();
+      const flashcards = document.querySelectorAll('.flashcard');
+      
+      flashcards.forEach(card => {
+        const question = card.querySelector('.flashcard-front p')?.textContent.toLowerCase() || "";
+        const answer = card.querySelector('.flashcard-back p')?.textContent.toLowerCase() || "";
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function deleteFlashcard(index) {
+      if (confirm("Are you sure you want to delete this flashcard?")) {
+        data[currentSubject][currentTopic].splice(index, 1);
+        saveData();
+        renderFlashcards();
+        showNotification("Flashcard deleted successfully!");
+      }
+    }
+
+    function openEditModal(type, value, index = null) {
+      editType = type;
+      editIndex = index;
+      
+      const modal = document.getElementById('edit-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const editInput = document.getElementById('edit-input');
+      
+      if (type === 'subject') {
+        modalTitle.textContent = 'Edit Subject';
+        editInput.value = value;
+      } else if (type === 'topic') {
+        modalTitle.textContent = 'Edit Topic';
+        editInput.value = value;
+      } else if (type === 'flashcard') {
+        modalTitle.textContent = 'Edit Flashcard';
+        editInput.value = data[currentSubject][currentTopic][index].question;
+      }
+      
+      modal.style.display = 'flex';
+      editInput.focus();
+    }
+
+    function closeModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    function saveEdit() {
+      const newValue = document.getElementById('edit-input').value.trim();
+      
+      if (!newValue) {
+        showNotification("Value cannot be empty!", 'error');
+        return;
+      }
+      
+      if (editType === 'subject') {
+        const oldName = currentSubject;
+        if (newValue !== oldName && !data[newValue]) {
+          data[newValue] = data[oldName];
+          delete data[oldName];
+          saveData();
+          showSubjects();
+          showNotification(`Subject renamed to "${newValue}" successfully!`);
+        } else if (data[newValue]) {
+          showNotification(`Subject "${newValue}" already exists!`, 'error');
+        }
+      } else if (editType === 'topic') {
+        const oldName = currentTopic;
+        if (newValue !== oldName && !data[currentSubject][newValue]) {
+          data[currentSubject][newValue] = data[currentSubject][oldName];
+          delete data[currentSubject][oldName];
+          saveData();
+          showTopics(currentSubject);
+          showNotification(`Topic renamed to "${newValue}" successfully!`);
+        } else if (data[currentSubject][newValue]) {
+          showNotification(`Topic "${newValue}" already exists!`, 'error');
+        }
+      } else if (editType === 'flashcard') {
+        data[currentSubject][currentTopic][editIndex].question = newValue;
+        saveData();
+        renderFlashcards();
+        showNotification("Flashcard updated successfully!");
+      }
+      
+      closeModal();
+    }
+
+    // Function to open the enlarged flashcard modal
+    function openEnlargedModal(index) {
+      currentCardIndex = index;
+      const card = data[currentSubject][currentTopic][index];
+      const modal = document.getElementById('enlarged-modal');
+      const modalTitle = document.getElementById('enlarged-modal-title');
+      const flashcard = document.getElementById('enlarged-flashcard');
+      const frontDiv = flashcard.querySelector('.enlarged-flashcard-front');
+      const backDiv = flashcard.querySelector('.enlarged-flashcard-back');
+      
+      // Set modal title
+      modalTitle.textContent = `${currentSubject} > ${currentTopic} > Flashcard ${index + 1}`;
+      
+      // Reset flip state
+      flashcard.classList.remove('flipped');
+      
+      // Set front content
+      let frontContent = "";
+      if (card.questionImage) {
+        frontContent += `<img src="${card.questionImage}" class="enlarged-flashcard-image">`;
+      }
+      if (card.question) {
+        frontContent += `<p class="enlarged-flashcard-text">${card.question}</p>`;
+      }
+      frontDiv.innerHTML = frontContent;
+      
+      // Set back content
+      let backContent = "";
+      if (card.answerImage) {
+        backContent += `<img src="${card.answerImage}" class="enlarged-flashcard-image">`;
+      }
+      if (card.answer) {
+        backContent += `<p class="enlarged-flashcard-text">${card.answer}</p>`;
+      }
+      backDiv.innerHTML = backContent;
+      
+      // Update counter
+      document.getElementById('current-card').textContent = index + 1;
+      document.getElementById('total-cards').textContent = data[currentSubject][currentTopic].length;
+      
+      // Update navigation buttons
+      document.getElementById('prev-btn').disabled = index === 0;
+      document.getElementById('next-btn').disabled = index === data[currentSubject][currentTopic].length - 1;
+      
+      modal.style.display = 'flex';
+    }
+
+    // Function to flip the enlarged flashcard
+    function flipEnlargedCard() {
+      const flashcard = document.getElementById('enlarged-flashcard');
+      flashcard.classList.toggle('flipped');
+    }
+
+    // Function to navigate to next/previous flashcard
+    function navigateFlashcard(direction) {
+      const newIndex = currentCardIndex + direction;
+      if (newIndex >= 0 && newIndex < data[currentSubject][currentTopic].length) {
+        openEnlargedModal(newIndex);
+      }
+    }
+
+    // Function to close the enlarged modal
+    function closeEnlargedModal() {
+      document.getElementById('enlarged-modal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const editModal = document.getElementById('edit-modal');
+      const enlargedModal = document.getElementById('enlarged-modal');
+      
+      if (event.target === editModal) {
+        closeModal();
+      }
+      
+      if (event.target === enlargedModal) {
+        closeEnlargedModal();
+      }
+    }
+
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load saved data
+      loadData();
+      
+      // Show the subjects page
+      showSubjects();
+      
+      // Add click event to enlarged flashcard for flipping
+      const enlargedFlashcard = document.getElementById('enlarged-flashcard');
+      if (enlargedFlashcard) {
+        enlargedFlashcard.addEventListener('click', function(e) {
+          // Don't flip if clicking on navigation buttons
+          if (!e.target.closest('.enlarged-flashcard-navigation')) {
+            flipEnlargedCard();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
