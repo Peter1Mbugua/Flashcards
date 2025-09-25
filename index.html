@@ -1036,10 +1036,18 @@
       if (savedData) {
         try {
           data = JSON.parse(savedData);
+          // Check if the data is in the expected format
+          if (typeof data !== 'object' || Array.isArray(data)) {
+            console.error("Data is not in the expected format, resetting");
+            data = {};
+            saveData();
+          }
         } catch (e) {
           console.error("Error parsing saved data:", e);
           data = {};
         }
+      } else {
+        data = {};
       }
     }
 
@@ -1070,11 +1078,27 @@
       document.getElementById("page-title").innerHTML = '<i class="fas fa-book-open"></i> FLASHCARD ORGANIZER';
       const content = document.getElementById("content");
       
+      // Calculate statistics
+      let subjectsCount = 0;
+      let topicsCount = 0;
+      let flashcardsCount = 0;
+      
+      for (let subject in data) {
+        subjectsCount++;
+        for (let topic in data[subject]) {
+          if (topic !== 'color') {
+            topicsCount++;
+            if (data[subject][topic] && data[subject][topic].flashcards && Array.isArray(data[subject][topic].flashcards)) {
+              flashcardsCount += data[subject][topic].flashcards.length;
+            }
+          }
+        }
+      }
+      
       const stats = {
-        subjects: Object.keys(data).length,
-        topics: Object.values(data).reduce((sum, subject) => sum + Object.keys(subject).length, 0),
-        flashcards: Object.values(data).reduce((sum, subject) => 
-          sum + Object.values(subject).reduce((topicSum, topic) => topicSum + topic.length, 0), 0)
+        subjects: subjectsCount,
+        topics: topicsCount,
+        flashcards: flashcardsCount
       };
       
       content.innerHTML = `
@@ -1113,8 +1137,19 @@
       
       const foldersContainer = document.getElementById("folders-container");
       for (let subject in data) {
-        const topicCount = Object.keys(data[subject]).length;
-        const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => sum + topic.length, 0);
+        // Calculate topic and flashcard counts for this subject
+        let subjectTopicCount = 0;
+        let subjectFlashcardCount = 0;
+        
+        for (let topic in data[subject]) {
+          if (topic !== 'color') {
+            subjectTopicCount++;
+            if (data[subject][topic] && data[subject][topic].flashcards && Array.isArray(data[subject][topic].flashcards)) {
+              subjectFlashcardCount += data[subject][topic].flashcards.length;
+            }
+          }
+        }
+        
         const color = data[subject].color || 'indigo';
         
         const div = document.createElement("div");
@@ -1125,7 +1160,7 @@
           <div class="folder-shape">
             <i class="fas fa-folder"></i>
             <div class="folder-title">${subject}</div>
-            <div class="folder-count">${topicCount} topics, ${flashcardCount} cards</div>
+            <div class="folder-count">${subjectTopicCount} topics, ${subjectFlashcardCount} cards</div>
             <div class="menu-container">
               <button class="menu-trigger" onclick="event.stopPropagation(); toggleMenu(this)"></button>
               <div class="menu-dropdown">
@@ -1178,12 +1213,18 @@
       document.getElementById("page-title").innerHTML = `<i class="fas fa-folder-open"></i> ${subject} Topics`;
       const content = document.getElementById("content");
       
-      const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => {
-        if (typeof topic === 'object' && !Array.isArray(topic)) {
-          return sum + (topic.flashcards ? topic.flashcards.length : 0);
+      // Calculate flashcard count for this subject
+      let flashcardCount = 0;
+      let topicCount = 0;
+      
+      for (let topic in data[subject]) {
+        if (topic !== 'color') {
+          topicCount++;
+          if (data[subject][topic] && data[subject][topic].flashcards && Array.isArray(data[subject][topic].flashcards)) {
+            flashcardCount += data[subject][topic].flashcards.length;
+          }
         }
-        return sum;
-      }, 0);
+      }
       
       content.innerHTML = `
         <button class="btn-back" onclick="showSubjects()">
@@ -1192,7 +1233,7 @@
         
         <div class="stats-container">
           <div class="stat-card">
-            <div class="stat-value">${Object.keys(data[subject]).filter(key => key !== 'color').length}</div>
+            <div class="stat-value">${topicCount}</div>
             <div class="stat-label">Topics</div>
           </div>
           <div class="stat-card">
@@ -1211,7 +1252,7 @@
         </div>
         
         <div class="folders-container" id="folders-container">
-          ${Object.keys(data[subject]).filter(key => key !== 'color').length === 0 ? 
+          ${topicCount === 0 ? 
             `<div class="empty-state">
               <i class="fas fa-folder"></i>
               <p>No topics yet. Add your first topic to get started!</p>
@@ -1224,7 +1265,7 @@
         if (topic === 'color') continue;
         
         const topicData = data[subject][topic];
-        const flashcardCount = topicData.flashcards ? topicData.flashcards.length : 0;
+        const flashcardCount = (topicData && topicData.flashcards && Array.isArray(topicData.flashcards)) ? topicData.flashcards.length : 0;
         const color = topicData.color || 'purple';
         
         const div = document.createElement("div");
