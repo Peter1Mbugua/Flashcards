@@ -19,6 +19,13 @@
       --warning: #f59e0b;
       --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --folder-blue: #4285f4;
+      --folder-green: #34a853;
+      --folder-yellow: #fbbc05;
+      --folder-red: #ea4335;
+      --folder-purple: #9c27b0;
+      --folder-pink: #e91e63;
+      --folder-indigo: #3f51b5;
     }
 
     * {
@@ -167,12 +174,10 @@
       margin-top: 20px;
     }
 
+    /* macOS-style Folder Design */
     .folder {
-      background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-      color: white;
-      border-radius: 16px;
-      padding: 25px 20px;
-      min-height: 150px;
+      position: relative;
+      min-height: 180px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -180,18 +185,47 @@
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
+      overflow: visible;
+      transform-style: preserve-3d;
+      perspective: 1000px;
     }
 
-    .folder::before {
-      content: "";
+    .folder-shape {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(
+        0 0, 
+        calc(100% - 30px) 0, 
+        100% 20px, 
+        100% 100%, 
+        0 100%
+      );
+      border-radius: 8px;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .folder-tab {
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
-      height: 8px;
-      background: var(--accent);
+      right: 20px;
+      width: 50px;
+      height: 30px;
+      background: inherit;
+      clip-path: polygon(
+        0 0, 
+        100% 0, 
+        100% 100%, 
+        70% 100%, 
+        0 70%
+      );
+      border-radius: 8px 8px 0 0;
+      z-index: 0;
     }
 
     .folder:hover {
@@ -200,27 +234,76 @@
     }
 
     .folder i {
-      font-size: 2rem;
+      font-size: 2.5rem;
       margin-bottom: 10px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      z-index: 2;
     }
 
     .folder-title {
       font-weight: 600;
       font-size: 1.1rem;
       text-align: center;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      z-index: 2;
     }
 
     .folder-count {
       font-size: 0.9rem;
-      opacity: 0.8;
+      opacity: 0.9;
       margin-top: 5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+
+    /* Folder Colors */
+    .folder[data-color="blue"] .folder-shape,
+    .folder[data-color="blue"] .folder-tab {
+      background: linear-gradient(135deg, #6fa0ff, #4285f4);
+      color: white;
+    }
+
+    .folder[data-color="green"] .folder-shape,
+    .folder[data-color="green"] .folder-tab {
+      background: linear-gradient(135deg, #7bc97b, #34a853);
+      color: white;
+    }
+
+    .folder[data-color="red"] .folder-shape,
+    .folder[data-color="red"] .folder-tab {
+      background: linear-gradient(135deg, #ff8a80, #ea4335);
+      color: white;
+    }
+
+    .folder[data-color="yellow"] .folder-shape,
+    .folder[data-color="yellow"] .folder-tab {
+      background: linear-gradient(135deg, #ffeb3b, #fbbc05);
+      color: #333;
+    }
+
+    .folder[data-color="purple"] .folder-shape,
+    .folder[data-color="purple"] .folder-tab {
+      background: linear-gradient(135deg, #ce93d8, #9c27b0);
+      color: white;
+    }
+
+    .folder[data-color="pink"] .folder-shape,
+    .folder[data-color="pink"] .folder-tab {
+      background: linear-gradient(135deg, #f8bbd0, #e91e63);
+      color: white;
+    }
+
+    .folder[data-color="indigo"] .folder-shape,
+    .folder[data-color="indigo"] .folder-tab {
+      background: linear-gradient(135deg, #9fa8da, #3f51b5);
+      color: white;
     }
 
     .flashcard {
       background: white;
       border-radius: 16px;
       padding: 25px;
-      min-height: 180px;
+      min-height: 200px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -230,7 +313,7 @@
       box-shadow: var(--shadow);
       border: 2px solid transparent;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
       transform-style: preserve-3d;
       perspective: 1000px;
     }
@@ -289,55 +372,6 @@
     .flashcard-text {
       font-size: 1rem;
       line-height: 1.4;
-    }
-
-    .flashcard-actions {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 5px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 10;
-    }
-
-    .flashcard:hover .flashcard-actions {
-      opacity: 1;
-    }
-
-    .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      color: var(--gray);
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow);
-    }
-
-    .action-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .action-btn.edit:hover {
-      background: var(--warning);
-      color: white;
-    }
-
-    .action-btn.delete:hover {
-      background: var(--danger);
-      color: white;
-    }
-
-    .action-btn.enlarge:hover {
-      background: var(--primary);
-      color: white;
     }
 
     .empty-state {
@@ -529,6 +563,14 @@
       .form-group {
         flex-direction: column;
       }
+      
+      .folder {
+        min-height: 160px;
+      }
+      
+      .flashcard {
+        min-height: 180px;
+      }
     }
 
     /* Enlarged Flashcard Modal Styles */
@@ -647,6 +689,239 @@
       font-size: 0.9rem;
       opacity: 0.8;
     }
+
+    /* Three Dot Menu Styles */
+    .menu-container {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+    }
+
+    .menu-trigger {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .menu-trigger:hover {
+      background: white;
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-trigger::before {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--dark);
+      box-shadow: 0 -6px 0 var(--dark), 0 6px 0 var(--dark);
+      transition: all 0.3s ease;
+    }
+
+    .menu-trigger.active::before {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .menu-trigger.active::after {
+      content: "×";
+      position: absolute;
+      font-size: 16px;
+      line-height: 1;
+      color: var(--dark);
+    }
+
+    .menu-dropdown {
+      position: absolute;
+      top: 36px;
+      right: 0;
+      min-width: 130px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+      z-index: 40;
+    }
+
+    .menu-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 5px 8px;
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+      margin: 1px;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      transform: translateX(2px);
+    }
+
+    .menu-item i {
+      margin-right: 6px;
+      width: 12px;
+      text-align: center;
+      color: var(--primary);
+      transition: all 0.2s ease;
+      font-size: 0.75rem;
+    }
+
+    .menu-item:hover i {
+      transform: scale(1.1);
+    }
+
+    .menu-item.delete {
+      color: var(--danger);
+    }
+
+    .menu-item.delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .menu-item.delete i {
+      color: var(--danger);
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Color Picker Styles */
+    .color-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .color-option {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-option:hover {
+      transform: scale(1.15);
+      border-color: var(--dark);
+    }
+
+    .color-option.selected {
+      border-color: var(--dark);
+      box-shadow: 0 0 0 2px white, 0 0 0 4px var(--dark);
+    }
+
+    .color-option.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 0 0 3px rgba(0,0,0,0.5);
+    }
+
+    .flashcard[data-color="blue"] {
+      border-color: var(--folder-blue);
+    }
+
+    .flashcard[data-color="green"] {
+      border-color: var(--folder-green);
+    }
+
+    .flashcard[data-color="red"] {
+      border-color: var(--folder-red);
+    }
+
+    .flashcard[data-color="yellow"] {
+      border-color: var(--folder-yellow);
+    }
+
+    .flashcard[data-color="purple"] {
+      border-color: var(--folder-purple);
+    }
+
+    .flashcard[data-color="pink"] {
+      border-color: var(--folder-pink);
+    }
+
+    .flashcard[data-color="indigo"] {
+      border-color: var(--folder-indigo);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .menu-trigger {
+        width: 24px;
+        height: 24px;
+      }
+      
+      .menu-dropdown {
+        min-width: 120px;
+        right: -5px;
+      }
+      
+      .menu-item {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+      }
+      
+      .menu-item i {
+        margin-right: 4px;
+        font-size: 0.7rem;
+        width: 10px;
+      }
+      
+      .folder-title {
+        font-size: 0.9rem;
+      }
+      
+      .folder-count {
+        font-size: 0.8rem;
+      }
+      
+      .folder {
+        min-height: 140px;
+      }
+      
+      .flashcard {
+        min-height: 160px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -673,6 +948,32 @@
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Color Picker Modal -->
+  <div id="color-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="color-modal-title">Change Color</h3>
+        <button class="close-modal" onclick="closeColorModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Select a color for this item:</p>
+        <div class="color-picker">
+          <div class="color-option" style="background-color: #4285f4" data-color="blue" onclick="selectColor('blue')"></div>
+          <div class="color-option" style="background-color: #34a853" data-color="green" onclick="selectColor('green')"></div>
+          <div class="color-option" style="background-color: #ea4335" data-color="red" onclick="selectColor('red')"></div>
+          <div class="color-option" style="background-color: #fbbc05" data-color="yellow" onclick="selectColor('yellow')"></div>
+          <div class="color-option" style="background-color: #9c27b0" data-color="purple" onclick="selectColor('purple')"></div>
+          <div class="color-option" style="background-color: #e91e63" data-color="pink" onclick="selectColor('pink')"></div>
+          <div class="color-option" style="background-color: #3f51b5" data-color="indigo" onclick="selectColor('indigo')"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeColorModal()">Cancel</button>
+        <button class="btn-primary" onclick="applyColor()">Apply</button>
       </div>
     </div>
   </div>
@@ -722,6 +1023,12 @@
     let editType = null;
     let editIndex = null;
     let currentCardIndex = 0;
+    let colorType = null;
+    let colorTarget = null;
+    let selectedColor = null;
+
+    // Color options
+    const colorOptions = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'indigo'];
 
     // Load data from localStorage when page loads
     function loadData() {
@@ -798,7 +1105,7 @@
         <div class="folders-container" id="folders-container">
           ${Object.keys(data).length === 0 ? 
             `<div class="empty-state">
-              <i class="fas fa-book"></i>
+              <i class="fas fa-folder"></i>
               <p>No subjects yet. Add your first subject to get started!</p>
             </div>` : ''}
         </div>
@@ -808,20 +1115,31 @@
       for (let subject in data) {
         const topicCount = Object.keys(data[subject]).length;
         const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => sum + topic.length, 0);
+        const color = data[subject].color || 'indigo';
         
         const div = document.createElement("div");
-        div.className = "folder";
+        div.className = `folder`;
+        div.setAttribute('data-color', color);
         div.innerHTML = `
-          <i class="fas fa-book"></i>
-          <div class="folder-title">${subject}</div>
-          <div class="folder-count">${topicCount} topics, ${flashcardCount} cards</div>
-          <div class="flashcard-actions">
-            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('subject', '${subject}')">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" onclick="event.stopPropagation(); deleteSubject('${subject}')">
-              <i class="fas fa-trash"></i>
-            </button>
+          <div class="folder-tab"></div>
+          <div class="folder-shape">
+            <i class="fas fa-folder"></i>
+            <div class="folder-title">${subject}</div>
+            <div class="folder-count">${topicCount} topics, ${flashcardCount} cards</div>
+            <div class="menu-container">
+              <button class="menu-trigger" onclick="event.stopPropagation(); toggleMenu(this)"></button>
+              <div class="menu-dropdown">
+                <div class="menu-item" onclick="event.stopPropagation(); openEditModal('subject', '${subject}')">
+                  <i class="fas fa-edit"></i> Edit
+                </div>
+                <div class="menu-item" onclick="event.stopPropagation(); openColorModal('subject', '${subject}')">
+                  <i class="fas fa-palette"></i> Change Color
+                </div>
+                <div class="menu-item delete" onclick="event.stopPropagation(); deleteSubject('${subject}')">
+                  <i class="fas fa-trash"></i> Delete
+                </div>
+              </div>
+            </div>
           </div>
         `;
         div.onclick = () => showTopics(subject);
@@ -833,7 +1151,7 @@
       const subject = document.getElementById("new-subject").value.trim();
       if (subject) {
         if (!data[subject]) {
-          data[subject] = {};
+          data[subject] = { color: 'indigo' };
           saveData();
           showSubjects();
           showNotification(`Subject "${subject}" added successfully!`);
@@ -860,7 +1178,12 @@
       document.getElementById("page-title").innerHTML = `<i class="fas fa-folder-open"></i> ${subject} Topics`;
       const content = document.getElementById("content");
       
-      const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => sum + topic.length, 0);
+      const flashcardCount = Object.values(data[subject]).reduce((sum, topic) => {
+        if (typeof topic === 'object' && !Array.isArray(topic)) {
+          return sum + (topic.flashcards ? topic.flashcards.length : 0);
+        }
+        return sum;
+      }, 0);
       
       content.innerHTML = `
         <button class="btn-back" onclick="showSubjects()">
@@ -869,7 +1192,7 @@
         
         <div class="stats-container">
           <div class="stat-card">
-            <div class="stat-value">${Object.keys(data[subject]).length}</div>
+            <div class="stat-value">${Object.keys(data[subject]).filter(key => key !== 'color').length}</div>
             <div class="stat-label">Topics</div>
           </div>
           <div class="stat-card">
@@ -888,9 +1211,9 @@
         </div>
         
         <div class="folders-container" id="folders-container">
-          ${Object.keys(data[subject]).length === 0 ? 
+          ${Object.keys(data[subject]).filter(key => key !== 'color').length === 0 ? 
             `<div class="empty-state">
-              <i class="fas fa-folder-open"></i>
+              <i class="fas fa-folder"></i>
               <p>No topics yet. Add your first topic to get started!</p>
             </div>` : ''}
         </div>
@@ -898,21 +1221,35 @@
       
       const foldersContainer = document.getElementById("folders-container");
       for (let topic in data[subject]) {
-        const flashcardCount = data[subject][topic].length;
+        if (topic === 'color') continue;
+        
+        const topicData = data[subject][topic];
+        const flashcardCount = topicData.flashcards ? topicData.flashcards.length : 0;
+        const color = topicData.color || 'purple';
         
         const div = document.createElement("div");
-        div.className = "folder";
+        div.className = `folder`;
+        div.setAttribute('data-color', color);
         div.innerHTML = `
-          <i class="fas fa-folder"></i>
-          <div class="folder-title">${topic}</div>
-          <div class="folder-count">${flashcardCount} flashcards</div>
-          <div class="flashcard-actions">
-            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('topic', '${topic}')">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" onclick="event.stopPropagation(); deleteTopic('${topic}')">
-              <i class="fas fa-trash"></i>
-            </button>
+          <div class="folder-tab"></div>
+          <div class="folder-shape">
+            <i class="fas fa-folder"></i>
+            <div class="folder-title">${topic}</div>
+            <div class="folder-count">${flashcardCount} flashcards</div>
+            <div class="menu-container">
+              <button class="menu-trigger" onclick="event.stopPropagation(); toggleMenu(this)"></button>
+              <div class="menu-dropdown">
+                <div class="menu-item" onclick="event.stopPropagation(); openEditModal('topic', '${topic}')">
+                  <i class="fas fa-edit"></i> Edit
+                </div>
+                <div class="menu-item" onclick="event.stopPropagation(); openColorModal('topic', '${topic}')">
+                  <i class="fas fa-palette"></i> Change Color
+                </div>
+                <div class="menu-item delete" onclick="event.stopPropagation(); deleteTopic('${topic}')">
+                  <i class="fas fa-trash"></i> Delete
+                </div>
+              </div>
+            </div>
           </div>
         `;
         div.onclick = () => showFlashcards(topic);
@@ -924,7 +1261,10 @@
       const topic = document.getElementById("new-topic").value.trim();
       if (topic) {
         if (!data[currentSubject][topic]) {
-          data[currentSubject][topic] = [];
+          data[currentSubject][topic] = { 
+            color: 'purple',
+            flashcards: []
+          };
           saveData();
           showTopics(currentSubject);
           showNotification(`Topic "${topic}" added successfully!`);
@@ -990,7 +1330,7 @@
         </div>
         
         <div class="flashcards-container" id="flashcards-container">
-          ${data[currentSubject][currentTopic].length === 0 ? 
+          ${!data[currentSubject][currentTopic].flashcards || data[currentSubject][currentTopic].flashcards.length === 0 ? 
             `<div class="empty-state">
               <i class="fas fa-sticky-note"></i>
               <p>No flashcards yet. Add your first flashcard to get started!</p>
@@ -1032,10 +1372,15 @@
           question: question || "",
           answer: answer || "",
           questionImage: questionImage,
-          answerImage: answerImage
+          answerImage: answerImage,
+          color: 'blue'
         };
         
-        data[currentSubject][currentTopic].push(flashcard);
+        if (!data[currentSubject][currentTopic].flashcards) {
+          data[currentSubject][currentTopic].flashcards = [];
+        }
+        
+        data[currentSubject][currentTopic].flashcards.push(flashcard);
         saveData();
         renderFlashcards();
         
@@ -1059,7 +1404,7 @@
       const container = document.getElementById("flashcards-container");
       container.innerHTML = "";
       
-      if (data[currentSubject][currentTopic].length === 0) {
+      if (!data[currentSubject][currentTopic].flashcards || data[currentSubject][currentTopic].flashcards.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-sticky-note"></i>
@@ -1069,9 +1414,10 @@
         return;
       }
       
-      data[currentSubject][currentTopic].forEach((card, i) => {
+      data[currentSubject][currentTopic].flashcards.forEach((card, i) => {
         const div = document.createElement("div");
-        div.className = "flashcard";
+        div.className = `flashcard`;
+        div.setAttribute('data-color', card.color || 'blue');
         div.dataset.index = i;
         
         let frontContent = "";
@@ -1094,16 +1440,22 @@
         }
         
         div.innerHTML = `
-          <div class="flashcard-actions">
-            <button class="action-btn edit" onclick="event.stopPropagation(); openEditModal('flashcard', ${i})">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" onclick="event.stopPropagation(); deleteFlashcard(${i})">
-              <i class="fas fa-trash"></i>
-            </button>
-            <button class="action-btn enlarge" onclick="event.stopPropagation(); openEnlargedModal(${i})">
-              <i class="fas fa-expand"></i>
-            </button>
+          <div class="menu-container">
+            <button class="menu-trigger" onclick="event.stopPropagation(); toggleMenu(this)"></button>
+            <div class="menu-dropdown">
+              <div class="menu-item" onclick="event.stopPropagation(); openEditModal('flashcard', null, ${i})">
+                <i class="fas fa-edit"></i> Edit
+              </div>
+              <div class="menu-item" onclick="event.stopPropagation(); openColorModal('flashcard', null, ${i})">
+                <i class="fas fa-palette"></i> Change Color
+              </div>
+              <div class="menu-item" onclick="event.stopPropagation(); openEnlargedModal(${i})">
+                <i class="fas fa-expand"></i> Enlarge
+              </div>
+              <div class="menu-item delete" onclick="event.stopPropagation(); deleteFlashcard(${i})">
+                <i class="fas fa-trash"></i> Delete
+              </div>
+            </div>
           </div>
           <div class="flashcard-inner">
             <div class="flashcard-front">
@@ -1116,7 +1468,7 @@
         `;
         
         div.onclick = function(e) {
-          if (e.target.closest('.action-btn')) return;
+          if (e.target.closest('.menu-container')) return;
           this.classList.toggle('flipped');
         };
         
@@ -1142,7 +1494,7 @@
 
     function deleteFlashcard(index) {
       if (confirm("Are you sure you want to delete this flashcard?")) {
-        data[currentSubject][currentTopic].splice(index, 1);
+        data[currentSubject][currentTopic].flashcards.splice(index, 1);
         saveData();
         renderFlashcards();
         showNotification("Flashcard deleted successfully!");
@@ -1165,7 +1517,7 @@
         editInput.value = value;
       } else if (type === 'flashcard') {
         modalTitle.textContent = 'Edit Flashcard';
-        editInput.value = data[currentSubject][currentTopic][index].question;
+        editInput.value = data[currentSubject][currentTopic].flashcards[index].question;
       }
       
       modal.style.display = 'flex';
@@ -1207,7 +1559,7 @@
           showNotification(`Topic "${newValue}" already exists!`, 'error');
         }
       } else if (editType === 'flashcard') {
-        data[currentSubject][currentTopic][editIndex].question = newValue;
+        data[currentSubject][currentTopic].flashcards[editIndex].question = newValue;
         saveData();
         renderFlashcards();
         showNotification("Flashcard updated successfully!");
@@ -1216,10 +1568,99 @@
       closeModal();
     }
 
+    // Function to toggle the menu
+    function toggleMenu(trigger) {
+      const dropdown = trigger.nextElementSibling;
+      
+      // Close all other menus
+      document.querySelectorAll('.menu-dropdown').forEach(menu => {
+        if (menu !== dropdown) {
+          menu.classList.remove('show');
+          menu.previousElementSibling.classList.remove('active');
+        }
+      });
+      
+      // Toggle current menu
+      trigger.classList.toggle('active');
+      dropdown.classList.toggle('show');
+    }
+
+    // Function to open the color modal
+    function openColorModal(type, target, index = null) {
+      colorType = type;
+      colorTarget = target;
+      editIndex = index;
+      
+      // Reset selected color
+      document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      // Set current color as selected
+      let currentColor = '';
+      if (type === 'subject') {
+        currentColor = data[target].color || 'indigo';
+      } else if (type === 'topic') {
+        currentColor = data[currentSubject][target].color || 'purple';
+      } else if (type === 'flashcard') {
+        currentColor = data[currentSubject][currentTopic].flashcards[index].color || 'blue';
+      }
+      
+      const colorOption = document.querySelector(`.color-option[data-color="${currentColor}"]`);
+      if (colorOption) {
+        colorOption.classList.add('selected');
+        selectedColor = currentColor;
+      }
+      
+      document.getElementById('color-modal').style.display = 'flex';
+    }
+
+    // Function to close the color modal
+    function closeColorModal() {
+      document.getElementById('color-modal').style.display = 'none';
+    }
+
+    // Function to select a color
+    function selectColor(color) {
+      document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      document.querySelector(`.color-option[data-color="${color}"]`).classList.add('selected');
+      selectedColor = color;
+    }
+
+    // Function to apply the selected color
+    function applyColor() {
+      if (!selectedColor) {
+        showNotification("Please select a color!", 'error');
+        return;
+      }
+      
+      if (colorType === 'subject') {
+        data[colorTarget].color = selectedColor;
+        saveData();
+        showSubjects();
+        showNotification(`Subject color changed successfully!`);
+      } else if (colorType === 'topic') {
+        data[currentSubject][colorTarget].color = selectedColor;
+        saveData();
+        showTopics(currentSubject);
+        showNotification(`Topic color changed successfully!`);
+      } else if (colorType === 'flashcard') {
+        data[currentSubject][currentTopic].flashcards[editIndex].color = selectedColor;
+        saveData();
+        renderFlashcards();
+        showNotification(`Flashcard color changed successfully!`);
+      }
+      
+      closeColorModal();
+    }
+
     // Function to open the enlarged flashcard modal
     function openEnlargedModal(index) {
       currentCardIndex = index;
-      const card = data[currentSubject][currentTopic][index];
+      const card = data[currentSubject][currentTopic].flashcards[index];
       const modal = document.getElementById('enlarged-modal');
       const modalTitle = document.getElementById('enlarged-modal-title');
       const flashcard = document.getElementById('enlarged-flashcard');
@@ -1254,11 +1695,11 @@
       
       // Update counter
       document.getElementById('current-card').textContent = index + 1;
-      document.getElementById('total-cards').textContent = data[currentSubject][currentTopic].length;
+      document.getElementById('total-cards').textContent = data[currentSubject][currentTopic].flashcards.length;
       
       // Update navigation buttons
       document.getElementById('prev-btn').disabled = index === 0;
-      document.getElementById('next-btn').disabled = index === data[currentSubject][currentTopic].length - 1;
+      document.getElementById('next-btn').disabled = index === data[currentSubject][currentTopic].flashcards.length - 1;
       
       modal.style.display = 'flex';
     }
@@ -1272,7 +1713,7 @@
     // Function to navigate to next/previous flashcard
     function navigateFlashcard(direction) {
       const newIndex = currentCardIndex + direction;
-      if (newIndex >= 0 && newIndex < data[currentSubject][currentTopic].length) {
+      if (newIndex >= 0 && newIndex < data[currentSubject][currentTopic].flashcards.length) {
         openEnlargedModal(newIndex);
       }
     }
@@ -1285,14 +1726,29 @@
     // Close modal when clicking outside
     window.onclick = function(event) {
       const editModal = document.getElementById('edit-modal');
+      const colorModal = document.getElementById('color-modal');
       const enlargedModal = document.getElementById('enlarged-modal');
       
       if (event.target === editModal) {
         closeModal();
       }
       
+      if (event.target === colorModal) {
+        closeColorModal();
+      }
+      
       if (event.target === enlargedModal) {
         closeEnlargedModal();
+      }
+      
+      // Close dropdown menus when clicking outside
+      if (!event.target.closest('.menu-container')) {
+        document.querySelectorAll('.menu-dropdown').forEach(menu => {
+          menu.classList.remove('show');
+        });
+        document.querySelectorAll('.menu-trigger').forEach(trigger => {
+          trigger.classList.remove('active');
+        });
       }
     }
 
